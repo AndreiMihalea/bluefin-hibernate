@@ -4,11 +4,12 @@ COPY build_files /
 COPY system_files /system_files
 
 # Base Image
-FROM ghcr.io/ublue-os/bazzite:stable
+# FROM ghcr.io/ublue-os/bazzite:stable
 ## Other possible base images include:
 # FROM ghcr.io/ublue-os/bazzite:testing
 # FROM ghcr.io/ublue-os/aurora:stable
 # FROM ghcr.io/ublue-os/bluefin-nvidia-open:stable
+FROM ghcr.io/ublue-os/bluefin-dx:stable
 # 
 # ... and so on, here are more base images
 # Universal Blue Images: https://github.com/orgs/ublue-os/packages
@@ -35,6 +36,13 @@ RUN --mount=type=bind,from=ctx,source=/,target=/ctx \
     --mount=type=cache,dst=/var/log \
     --mount=type=tmpfs,dst=/tmp \
     /ctx/build.sh
+
+RUN set -eux; \
+    kver="$(basename "$(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d)")"; \
+    test -n "$kver"; \
+    test "$(find /usr/lib/modules -mindepth 1 -maxdepth 1 -type d | wc -l)" -eq 1; \
+    env DRACUT_NO_XATTR=1 \
+        dracut -vf "/usr/lib/modules/${kver}/initramfs.img" "$kver"
 
 ### LINTING
 ## Verify final image and contents are correct.

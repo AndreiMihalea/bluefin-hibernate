@@ -15,6 +15,10 @@ on:
 
 env:
   IMAGE_REGISTRY: "ghcr.io/${{ github.repository_owner }}"  # do not edit
+  COSIGN_EXPERIMENTAL: false
+  COSIGN_PRIVATE_KEY: ${{ secrets.SIGNING_SECRET }}
+  COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+  DIGEST: ${{ steps.push-image.outputs.digest }}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref || github.run_id }}-${{ inputs.brand_name}}-${{ inputs.stream_name }}
